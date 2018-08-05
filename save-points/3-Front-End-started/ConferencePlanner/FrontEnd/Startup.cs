@@ -35,12 +35,27 @@ namespace FrontEnd
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
                 .AddAzureAD(options => Configuration.Bind("AzureAD", options));
 
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin", policy =>
+                {
+                    policy.RequireAuthenticatedUser().RequireUserName(Configuration["admin"]);
+                });
+            });
+
             services.AddMvc(options => {
                 var policy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            })
+            .AddRazorPagesOptions(options =>
+            {
+                options.Conventions.AuthorizeFolder("/Admin", "Admin");
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            
 
             services.AddHttpClient<IApiClient, ApiClient>(client => client.BaseAddress = new Uri(Configuration["serviceUrl"]));        }
 

@@ -1,11 +1,10 @@
-﻿using System;
+﻿using ConferenceDTO;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using ConferenceDTO;
-using FrontEnd.Services;
 
 namespace FrontEnd.Pages
 {
@@ -18,14 +17,21 @@ namespace FrontEnd.Pages
         public int CurrentDayOffset { get; set; }
 
         protected readonly IApiClient _apiClient;
+        private readonly IAuthorizationService _authorizationService;
 
-        public IndexModel(IApiClient apiClient)
+        public bool IsAdmin { get; set; }
+
+        public IndexModel(IApiClient apiClient, IAuthorizationService authorizationService)
         {
             _apiClient = apiClient;
+            _authorizationService = authorizationService;
         }
 
         public async Task OnGet(int day = 0)
         {
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, "Admin");
+            IsAdmin = authorizationResult.Succeeded;
+
             CurrentDayOffset = day;
 
             var sessions = await _apiClient.GetSessionsAsync();
