@@ -27,11 +27,7 @@ namespace FrontEnd
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddHttpClient<IApiClient, ApiClient>(client =>
-            {
-                client.BaseAddress = new Uri(Configuration["serviceUrl"]);
-            });;
-        }
+            services.AddHttpClient<IApiClient, ApiClient>(client => client.BaseAddress = new Uri(Configuration["serviceUrl"]));        }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
