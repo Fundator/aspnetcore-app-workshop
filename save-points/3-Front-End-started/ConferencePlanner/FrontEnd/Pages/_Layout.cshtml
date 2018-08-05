@@ -37,8 +37,13 @@
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
-                            </button>
-                            <a asp-page="/Index" class="navbar-brand">My Conference @System.DateTime.Now.Year</a>
+                            </button>                            
+                        </div>
+                        <div class="navbar-collapse collapse">
+                            <ul class="nav navbar-nav">
+                                <li><a asp-page="/Index">My Conference @System.DateTime.Now.Year</a></li>
+                            </ul>
+                            <partial name="_LoginPartial" />
                         </div>
                     </div>
                 </nav>
