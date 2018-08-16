@@ -20,7 +20,7 @@ namespace FrontEnd.Services
 
         public async Task AddAttendeeAsync(Attendee attendee)
         {
-            var response = await _httpClient.PostJsonAsync($"/api/attendees", attendee);
+            var response = await _httpClient.PostJsonAsync($"/api/attendees", attendee).ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
         }
@@ -32,7 +32,7 @@ namespace FrontEnd.Services
                 return null;
             }
 
-            var response = await _httpClient.GetAsync($"/api/attendees/{name}");
+            var response = await _httpClient.GetAsync($"/api/attendees/{name}").ConfigureAwait(false);
 
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
@@ -41,12 +41,12 @@ namespace FrontEnd.Services
 
             response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadAsJsonAsync<AttendeeResponse>();
+            return await response.Content.ReadAsJsonAsync<AttendeeResponse>().ConfigureAwait(false);
         }
 
         public async Task<SessionResponse> GetSessionAsync(int id)
         {
-            var response = await _httpClient.GetAsync($"/api/sessions/{id}");
+            var response = await _httpClient.GetAsync($"/api/sessions/{id}").ConfigureAwait(false);
 
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
@@ -55,21 +55,21 @@ namespace FrontEnd.Services
 
             response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadAsJsonAsync<SessionResponse>();
+            return await response.Content.ReadAsJsonAsync<SessionResponse>().ConfigureAwait(false);
         }
 
         public async Task<List<SessionResponse>> GetSessionsAsync()
         {
-            var response = await _httpClient.GetAsync("/api/sessions");
+            var response = await _httpClient.GetAsync("/api/sessions").ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadAsJsonAsync<List<SessionResponse>>();
+            return await response.Content.ReadAsJsonAsync<List<SessionResponse>>().ConfigureAwait(false);
         }
 
         public async Task DeleteSessionAsync(int id)
         {
-            var response = await _httpClient.DeleteAsync($"/api/sessions/{id}");
+            var response = await _httpClient.DeleteAsync($"/api/sessions/{id}").ConfigureAwait(false);
 
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
@@ -81,7 +81,7 @@ namespace FrontEnd.Services
 
         public async Task<SpeakerResponse> GetSpeakerAsync(int id)
         {
-            var response = await _httpClient.GetAsync($"/api/speakers/{id}");
+            var response = await _httpClient.GetAsync($"/api/speakers/{id}").ConfigureAwait(false);
 
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
@@ -90,21 +90,21 @@ namespace FrontEnd.Services
 
             response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadAsJsonAsync<SpeakerResponse>();
+            return await response.Content.ReadAsJsonAsync<SpeakerResponse>().ConfigureAwait(false);
         }
 
         public async Task<List<SpeakerResponse>> GetSpeakersAsync()
         {
-            var response = await _httpClient.GetAsync("/api/speakers");
+            var response = await _httpClient.GetAsync("/api/speakers").ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadAsJsonAsync<List<SpeakerResponse>>();
+            return await response.Content.ReadAsJsonAsync<List<SpeakerResponse>>().ConfigureAwait(false);
         }
 
         public async Task PutSessionAsync(Session session)
         {
-            var response = await _httpClient.PutJsonAsync($"/api/sessions/{session.ID}", session);
+            var response = await _httpClient.PutJsonAsync($"/api/sessions/{session.ID}", session).ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
         }
@@ -116,11 +116,49 @@ namespace FrontEnd.Services
                 Query = query
             };
 
-            var response = await _httpClient.PostJsonAsync($"/api/search", term);
+            var response = await _httpClient.PostJsonAsync($"/api/search", term).ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadAsJsonAsync<List<SearchResult>>();
+            return await response.Content.ReadAsJsonAsync<List<SearchResult>>().ConfigureAwait(false);
+        }
+
+        public async Task AddSessionToAttendeeAsync(string name, int sessionId)
+        {
+            var response = await _httpClient.PostAsync($"/api/attendees/{name}/session/{sessionId}", null).ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task RemoveSessionFromAttendeeAsync(string name, int sessionId)
+        {
+            var response = await _httpClient.DeleteAsync($"/api/attendees/{name}/session/{sessionId}").ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task<List<SessionResponse>> GetSessionsByAttendeeAsync(string name)
+        {
+            // TODO: Would be better to add backend API for this
+
+            var sessionsTask = GetSessionsAsync();
+            var attendeeTask = GetAttendeeAsync(name);
+
+            await Task.WhenAll(sessionsTask, attendeeTask).ConfigureAwait(false);
+
+            var sessions = await sessionsTask;
+            var attendee = await attendeeTask;
+
+            if (attendee == null)
+            {
+                return new List<SessionResponse>();
+            }
+
+            var sessionIds = attendee.Sessions.Select(s => s.ID);
+
+            sessions.RemoveAll(s => !sessionIds.Contains(s.ID));
+
+            return sessions;
         }
     }
 }

@@ -42,6 +42,7 @@
                         <div class="navbar-collapse collapse">
                             <ul class="nav navbar-nav">
                                 <li><a asp-page="/Index">My Conference @System.DateTime.Now.Year</a></li>
+                                <li authz="true"><a asp-page="/MyAgenda">My Agenda</a></li>
                             </ul>
                             <partial name="_LoginPartial" />
                         </div>

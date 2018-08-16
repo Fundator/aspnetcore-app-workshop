@@ -35,6 +35,8 @@ namespace FrontEnd
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
                 .AddAzureAD(options => Configuration.Bind("AzureAD", options));
 
+            services.AddTransient<RequireLoginFilter>();
+
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("Admin", policy =>
@@ -48,6 +50,7 @@ namespace FrontEnd
                     .RequireAuthenticatedUser()
                     .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
+                options.Filters.AddService<RequireLoginFilter>();
             })
             .AddRazorPagesOptions(options =>
             {

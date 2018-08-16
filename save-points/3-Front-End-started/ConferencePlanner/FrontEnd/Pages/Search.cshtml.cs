@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using ConferenceDTO;
-using FrontEnd.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace FrontEnd.Pages
