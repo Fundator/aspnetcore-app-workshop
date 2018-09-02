@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ConferenceDTO;
+using FrontEnd.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ConferenceDTO;
+using System;
+using System.Linq;
 using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 
 namespace FrontEnd.Pages
 {
@@ -14,7 +14,6 @@ namespace FrontEnd.Pages
         private readonly IApiClient _apiClient;
 
         private readonly HtmlEncoder _htmlEncoder;
-    
 
         public SessionModel(IApiClient apiClient, HtmlEncoder htmlEncoder)
         {
