@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ConferenceDTO;
+using FrontEnd.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ConferenceDTO;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace FrontEnd.Pages.Admin
 {
@@ -23,8 +23,6 @@ namespace FrontEnd.Pages.Admin
 
         [TempData]
         public string Message { get; set; }
-
-        public bool ShowMessage => !string.IsNullOrEmpty(Message);
 
         public async Task OnGetAsync(int id)
         {
@@ -52,7 +50,7 @@ namespace FrontEnd.Pages.Admin
 
             await _apiClient.PutSessionAsync(Session);
 
-            return RedirectToPage();
+            return RedirectToPage("/Index");
         }
 
         public async Task<IActionResult> OnPostDeleteAsync(int id)
