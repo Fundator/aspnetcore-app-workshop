@@ -1,10 +1,9 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using BackEnd.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackEnd
+namespace BackEnd.Controllers
 {
     [Route("/api/[controller]")]
     public class AttendeesController : Controller
@@ -54,22 +53,6 @@ namespace BackEnd
             var result = attendee.MapAttendeeResponse();
 
             return CreatedAtAction(nameof(Get), new { username = result.UserName }, result);
-        }
-
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> Delete([FromRoute]int id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var attendee = new Attendee { ID = id };
-
-            _db.Attendees.Remove(attendee);
-            await _db.SaveChangesAsync();
-
-            return NoContent();
         }
 
         [HttpPost("{username}/session/{sessionId:int}")]

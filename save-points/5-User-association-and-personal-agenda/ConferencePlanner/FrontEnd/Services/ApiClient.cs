@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using ConferenceDTO;
+using DTO;
 using FrontEnd.Infrastructure;
 
 namespace FrontEnd.Services
@@ -139,7 +139,7 @@ namespace FrontEnd.Services
 
         public async Task<List<SessionResponse>> GetSessionsByAttendeeAsync(string name)
         {
-            // TODO: Add backend API for this
+            // TODO: Would be better to add backend API for this
 
             var sessionsTask = GetSessionsAsync();
             var attendeeTask = GetAttendeeAsync(name);
