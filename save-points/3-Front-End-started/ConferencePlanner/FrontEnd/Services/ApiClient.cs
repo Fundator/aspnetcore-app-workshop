@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using ConferenceDTO;
+using DTO;
 using FrontEnd.Infrastructure;
 
 namespace FrontEnd.Services

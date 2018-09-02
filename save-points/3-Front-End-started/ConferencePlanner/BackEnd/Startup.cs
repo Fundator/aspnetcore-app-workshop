@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using BackEnd.Data;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using BackEnd.Data;
+using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
+using System;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace BackEnd
@@ -23,36 +18,53 @@ namespace BackEnd
         }
 
         public IConfiguration Configuration { get; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-             services.AddDbContext<ApplicationDbContext>(options =>
-             {
-                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                 {
-                     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-                 }
-                 else
-                 {
-                     options.UseSqlite("Data Source=conferences.db");
-                 }
-             });
+            services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                }
+                else
+                {
+                    options.UseSqlite("Data Source=conferences.db");
+                }
+            });
 
             services.AddMvcCore()
+                .AddDataAnnotations()
                 .AddJsonFormatters()
                 .AddApiExplorer();
 
             services.AddSwaggerGen(options =>
                 options.SwaggerDoc("v1", new Info { Title = "Conference Planner API", Version = "v1" })
             );
+        }
 
-            services.AddMvc();
+        private void InitializeDatabase(IServiceProvider applicationServices)
+        {
+            using (var scope = applicationServices.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetService<ApplicationDbContext>();
+
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            InitializeDatabase(app.ApplicationServices);
+
             app.UseSwagger();
 
             app.UseSwaggerUI(options =>
@@ -60,12 +72,6 @@ namespace BackEnd
             );
 
             app.UseMvc();
-
-            app.Run(context =>
-            {
-                context.Response.Redirect("/swagger");
-                return Task.CompletedTask;
-            });
 
             // Comment out the following line to avoid resetting the database each time
             var loader = new DevIntersectionLoader(app.ApplicationServices);
