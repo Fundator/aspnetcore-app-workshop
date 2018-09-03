@@ -1,24 +1,18 @@
-﻿using System;
+﻿using ConferenceDTO;
+using FrontEnd.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using ConferenceDTO;
-using FrontEnd.Services;
-using Microsoft.AspNetCore.Authorization;
 
 namespace FrontEnd.Pages
 {
     public class IndexModel : PageModel
     {
-        public IEnumerable<IGrouping<DateTimeOffset?, SessionResponse>> Sessions { get; set; }
-
-        public IEnumerable<(int Offset, DayOfWeek? DayofWeek)> DayOffsets { get; set; }
-
-        public int CurrentDayOffset { get; set; }
-
-        private readonly IApiClient _apiClient;
+        protected readonly IApiClient _apiClient;
         private readonly IAuthorizationService _authzService;
 
         public IndexModel(IApiClient apiClient, IAuthorizationService authzService)
@@ -26,11 +20,25 @@ namespace FrontEnd.Pages
             _apiClient = apiClient;
             _authzService = authzService;
         }
+       
+        public IEnumerable<IGrouping<DateTimeOffset?, SessionResponse>> Sessions { get; set; }
+
+        public IEnumerable<(int Offset, DayOfWeek? DayofWeek)> DayOffsets { get; set; }
+
+        public int CurrentDayOffset { get; set; }
 
         public bool IsAdmin { get; set; }
 
+        [TempData]
+        public string Message { get; set; }
+
+        public bool ShowMessage => !string.IsNullOrEmpty(Message);
+
         public async Task OnGet(int day = 0)
         {
+            var authzResult = await _authzService.AuthorizeAsync(User, "Admin");
+            IsAdmin = authzResult.Succeeded;
+
             CurrentDayOffset = day;
 
             var sessions = await _apiClient.GetSessionsAsync();
