@@ -1,0 +1,7 @@
+﻿<ul class="nav navbar-nav navbar-right">
+    <li authz="true" class="navbar-text">Hello @User.Identity.Name!</li>
+    <li authz="true"><a asp-area="AzureAD" asp-controller="Account" asp-action="SignOut">Sign out</a></li>
+</ul>
+<ul class="nav navbar-nav navbar-right">
+    <li authz="false"><a asp-area="AzureAD" asp-controller="Account" asp-action="SignIn">Sign in</a></li>
+</ul>

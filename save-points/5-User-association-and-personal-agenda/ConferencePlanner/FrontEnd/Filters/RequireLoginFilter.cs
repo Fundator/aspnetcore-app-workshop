@@ -1,13 +1,13 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using FrontEnd.Filters;
-using FrontEnd.Services;
+﻿using FrontEnd.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace FrontEnd
+namespace FrontEnd.Filters
 {
     public class RequireLoginFilter : IAsyncResourceFilter
     {

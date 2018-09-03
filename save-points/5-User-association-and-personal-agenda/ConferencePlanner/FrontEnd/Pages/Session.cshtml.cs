@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ConferenceDTO;
+using FrontEnd.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ConferenceDTO;
+using System;
+using System.Linq;
 using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 
 namespace FrontEnd.Pages
 {
@@ -14,7 +14,6 @@ namespace FrontEnd.Pages
         private readonly IApiClient _apiClient;
 
         private readonly HtmlEncoder _htmlEncoder;
-
 
         public SessionModel(IApiClient apiClient, HtmlEncoder htmlEncoder)
         {
@@ -28,18 +27,18 @@ namespace FrontEnd.Pages
 
         public bool IsInPersonalAgenda { get; set; }
 
-        public async Task<IActionResult> OnGet(int id)
+        public async Task<IActionResult> OnGetAsync(int id)
         {
             Session = await _apiClient.GetSessionAsync(id);
+
+            var sessions = await _apiClient.GetSessionsByAttendeeAsync(User.Identity.Name);
+
+            IsInPersonalAgenda = sessions.Any(s => s.ID == id);
 
             if (Session == null)
             {
                 return RedirectToPage("/Index");
             }
-
-            var userSessions = await _apiClient.GetSessionsByAttendeeAsync(User.Identity.Name);
-
-            IsInPersonalAgenda = userSessions.Any(u => u.ID == id);
 
             var allSessions = await _apiClient.GetSessionsAsync();
 
